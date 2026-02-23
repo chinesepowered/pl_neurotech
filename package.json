@@ -12,30 +12,34 @@
         "seed": "hardhat run scripts/seed.ts --network calibration"
     },
     "dependencies": {
+        "@ai-sdk/cerebras": "^2.0.34",
+        "@ai-sdk/react": "^3.0.99",
+        "@openzeppelin/contracts": "^5.1.0",
+        "ai": "^6.0.97",
+        "canvas-confetti": "^1.9.3",
+        "ethers": "^6.13.4",
+        "framer-motion": "^12.6.3",
         "next": "^15.3.0",
         "react": "^19.0.0",
         "react-dom": "^19.0.0",
-        "@ai-sdk/cerebras": "^2.0.34",
-        "ai": "^4.3.16",
-        "ethers": "^6.13.4",
-        "framer-motion": "^12.6.3",
-        "zustand": "^5.0.3",
-        "canvas-confetti": "^1.9.3",
-        "@openzeppelin/contracts": "^5.1.0"
+        "zod": "^4.3.6",
+        "zustand": "^5.0.3"
     },
     "devDependencies": {
-        "typescript": "^5.7.3",
+        "@eslint/eslintrc": "^3.3.4",
+        "@nomicfoundation/hardhat-toolbox": "^5.0.0",
+        "@tailwindcss/postcss": "^4.0.0",
+        "@types/canvas-confetti": "^1.6.4",
         "@types/node": "^22.10.5",
         "@types/react": "^19.0.7",
         "@types/react-dom": "^19.0.3",
-        "@types/canvas-confetti": "^1.6.4",
-        "tailwindcss": "^4.0.0",
-        "@tailwindcss/postcss": "^4.0.0",
-        "postcss": "^8.5.1",
+        "dotenv": "^17.3.1",
         "eslint": "^9",
         "eslint-config-next": "^15.3.0",
         "hardhat": "^2.22.17",
-        "@nomicfoundation/hardhat-toolbox": "^5.0.0",
-        "ts-node": "^10.9.2"
+        "postcss": "^8.5.1",
+        "tailwindcss": "^4.0.0",
+        "ts-node": "^10.9.2",
+        "typescript": "^5.7.3"
     }
 }

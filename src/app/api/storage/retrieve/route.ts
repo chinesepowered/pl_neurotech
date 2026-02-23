@@ -20,7 +20,7 @@ export async function GET(request: Request) {
       });
     }
 
-    return new Response(data, {
+    return new Response(data.buffer as ArrayBuffer, {
       headers: { 'Content-Type': 'application/octet-stream' },
     });
   } catch (error) {
