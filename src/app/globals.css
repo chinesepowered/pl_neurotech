@@ -1,0 +1,85 @@
+@import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+
+@theme {
+  --color-bg-primary: #0a0a0f;
+  --color-bg-panel: #12121a;
+  --color-bg-card: #1a1a2e;
+  --color-bg-elevated: #222238;
+  --color-neon-cyan: #00ffff;
+  --color-neon-magenta: #ff00ff;
+  --color-neon-green: #39ff14;
+  --color-neon-amber: #ffd740;
+  --color-neon-purple: #a855f7;
+  --color-neon-pink: #ec4899;
+  --color-neon-blue: #3b82f6;
+  --color-neon-red: #ef4444;
+  --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+}
+
+body {
+  background: var(--color-bg-primary);
+  color: #e2e8f0;
+  font-family: var(--font-sans);
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--color-bg-primary); }
+::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #555; }
+
+/* Neon glow utilities */
+.glow-cyan { box-shadow: 0 0 15px rgba(0, 255, 255, 0.15), 0 0 30px rgba(0, 255, 255, 0.05); }
+.glow-magenta { box-shadow: 0 0 15px rgba(255, 0, 255, 0.15), 0 0 30px rgba(255, 0, 255, 0.05); }
+.glow-green { box-shadow: 0 0 15px rgba(57, 255, 20, 0.15), 0 0 30px rgba(57, 255, 20, 0.05); }
+.glow-amber { box-shadow: 0 0 15px rgba(255, 215, 64, 0.15), 0 0 30px rgba(255, 215, 64, 0.05); }
+
+.text-glow-cyan { text-shadow: 0 0 10px rgba(0, 255, 255, 0.5); }
+.text-glow-magenta { text-shadow: 0 0 10px rgba(255, 0, 255, 0.5); }
+.text-glow-green { text-shadow: 0 0 10px rgba(57, 255, 20, 0.5); }
+
+/* Gradient mesh background */
+.gradient-mesh {
+  background:
+    radial-gradient(ellipse at 20% 50%, rgba(0, 255, 255, 0.05) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 20%, rgba(255, 0, 255, 0.05) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 80%, rgba(57, 255, 20, 0.03) 0%, transparent 50%),
+    var(--color-bg-primary);
+}
+
+/* Glass panel */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* Grid pattern overlay */
+.grid-pattern {
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+/* Pulse animation for indicators */
+@keyframes pulse-neon {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.animate-pulse-neon {
+  animation: pulse-neon 2s ease-in-out infinite;
+}
+
+/* Typing cursor */
+@keyframes blink {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0; }
+}
+
+.animate-blink {
+  animation: blink 1s step-end infinite;
+}
