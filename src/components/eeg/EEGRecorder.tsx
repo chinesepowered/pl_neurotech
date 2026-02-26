@@ -10,7 +10,9 @@ import ChannelLabels from './ChannelLabels';
 import SessionMetadata from './SessionMetadata';
 
 const BUFFER_SIZE = 1024;
-const SAMPLES_PER_FRAME = 8; // samples generated per animation frame (~30fps * 8 = ~240 samples/s)
+// At ~60fps, 4 samples/frame gives ~240 samples/s which approximates 256Hz
+// At lower framerates the visual still looks smooth
+const SAMPLES_PER_FRAME = 4;
 
 export default function EEGRecorder() {
   const { isRecording, isPaused, duration, session, startRecording, stopRecording, pauseRecording, resumeRecording, addSamples } = useEEGStore();
@@ -63,8 +65,9 @@ export default function EEGRecorder() {
   useEffect(() => {
     if (!isRecording && !session) {
       generatorRef.current = new EEGGenerator(SAMPLE_RATE, EEG_CHANNELS);
+      let active = true;
       const idleTick = () => {
-        if (!generatorRef.current) return;
+        if (!active || !generatorRef.current) return;
         const batch = generatorRef.current.generateBatch(SAMPLES_PER_FRAME);
         for (const sample of batch) {
           for (let ch = 0; ch < sample.channels.length; ch++) {
@@ -76,7 +79,10 @@ export default function EEGRecorder() {
         animRef.current = requestAnimationFrame(idleTick);
       };
       animRef.current = requestAnimationFrame(idleTick);
-      return () => cancelAnimationFrame(animRef.current);
+      return () => {
+        active = false;
+        cancelAnimationFrame(animRef.current);
+      };
     }
   }, [isRecording, session]);
 

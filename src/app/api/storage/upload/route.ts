@@ -4,10 +4,10 @@ import { uploadToFilecoin } from '@/lib/filecoin/synapse';
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { sessionId, channels, sampleRate, duration, dataSize } = body;
+    const { sessionId, channels, sampleRate, duration, dataSize, eegData } = body;
 
-    // Create metadata
-    const metadata = {
+    // Build the full payload — include actual EEG data if provided
+    const payload = {
       sessionId,
       channels,
       sampleRate,
@@ -15,10 +15,11 @@ export async function POST(request: Request) {
       dataSize,
       format: 'eeg-json',
       createdAt: new Date().toISOString(),
+      ...(eegData ? { data: eegData } : {}),
     };
 
-    // Convert to buffer for upload
-    const data = new TextEncoder().encode(JSON.stringify(metadata));
+    // Convert to buffer for upload — includes real data when available
+    const data = new TextEncoder().encode(JSON.stringify(payload));
     const result = await uploadToFilecoin(data, `${sessionId}.json`);
 
     return NextResponse.json({

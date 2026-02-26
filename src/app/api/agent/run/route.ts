@@ -1,19 +1,28 @@
-import { streamText, stepCountIs } from 'ai';
+import { streamText, stepCountIs, convertToModelMessages } from 'ai';
 import { cerebras } from '@ai-sdk/cerebras';
 import { AGENT_SYSTEM_PROMPT } from '@/lib/agent/system-prompt';
-import { agentTools } from '@/lib/agent/tools';
+import { agentTools, resetAgentSession } from '@/lib/agent/tools';
 
 export const maxDuration = 60;
 
 export async function POST(request: Request) {
   const { messages, budget = '0.05' } = await request.json();
 
-  const systemPrompt = `${AGENT_SYSTEM_PROMPT}\n\n## Current Session\n- Budget: ${budget} tFIL\n- Timestamp: ${new Date().toISOString()}`;
+  // Reset session spending tracker for new agent runs
+  const budgetNum = parseFloat(budget);
+  if (messages.length <= 1) {
+    resetAgentSession(budgetNum);
+  }
+
+  const systemPrompt = `${AGENT_SYSTEM_PROMPT}\n\n## Current Session\n- Budget: ${budget} tFIL\n- Timestamp: ${new Date().toISOString()}\n- Important: Use the budgetRemaining field in tool results to track your spending. Do not exceed your budget.`;
+
+  // Convert UIMessages (from useChat) to ModelMessages (for streamText)
+  const modelMessages = convertToModelMessages(messages);
 
   const result = streamText({
     model: cerebras('llama-3.3-70b'),
     system: systemPrompt,
-    messages,
+    messages: modelMessages,
     tools: agentTools,
     stopWhen: stepCountIs(10),
   });

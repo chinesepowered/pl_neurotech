@@ -3,13 +3,15 @@ import "@nomicfoundation/hardhat-toolbox";
 import * as dotenv from "dotenv";
 dotenv.config({ path: ".env.local" });
 
-const PRIVATE_KEY = process.env.FILECOIN_PRIVATE_KEY || "0x0000000000000000000000000000000000000000000000000000000000000001";
+const raw = process.env.FILECOIN_PRIVATE_KEY || "0000000000000000000000000000000000000000000000000000000000000001";
+const PRIVATE_KEY = raw.startsWith("0x") ? raw : `0x${raw}`;
 
 const config: HardhatUserConfig = {
   solidity: {
     version: "0.8.20",
     settings: {
       optimizer: { enabled: true, runs: 200 },
+      viaIR: true,
     },
   },
   networks: {

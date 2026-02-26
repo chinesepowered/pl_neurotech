@@ -68,6 +68,16 @@ export default function WaveformCanvas({ channels, buffers, bufferIndex, bufferS
       const amplitude = (channelHeight - padding * 2) / 2;
       const color = channels[ch].color;
 
+      // Dynamic amplitude scaling: find max value in visible range for this channel
+      let maxVal = 0;
+      for (let i = 0; i < visibleSamples; i++) {
+        const idx = (bufferIndex - visibleSamples + i + bufferSize) % bufferSize;
+        const absVal = Math.abs(buffer[idx] || 0);
+        if (absVal > maxVal) maxVal = absVal;
+      }
+      // Use 50µV as minimum scale (typical EEG range), clamp to at least that
+      const scale = Math.max(maxVal, 50);
+
       // Glow effect
       ctx.shadowColor = color;
       ctx.shadowBlur = 8;
@@ -79,7 +89,7 @@ export default function WaveformCanvas({ channels, buffers, bufferIndex, bufferS
         const idx = (bufferIndex - visibleSamples + i + bufferSize) % bufferSize;
         const val = buffer[idx] || 0;
         const x = (i / visibleSamples) * w;
-        const y = centerY - (val / 100) * amplitude;
+        const y = centerY - (val / scale) * amplitude;
 
         if (i === 0) {
           ctx.moveTo(x, y);

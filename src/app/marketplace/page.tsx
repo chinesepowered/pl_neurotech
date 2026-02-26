@@ -9,9 +9,9 @@ import Link from 'next/link';
 
 const DESCRIPTIONS: Record<number, string> = {
   0: 'Resting State EEG - Eyes Open',
-  1: 'Cognitive Task EEG - Working Memory',
+  1: 'Cognitive Task EEG - Working Memory (Premium)',
   2: 'Sleep Stage N2 EEG Recording',
-  3: 'Motor Imagery BCI - Left/Right Hand',
+  3: 'Motor Imagery BCI - Budget Session',
   4: 'Meditation EEG - Deep Alpha State',
 };
 

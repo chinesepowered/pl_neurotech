@@ -27,18 +27,25 @@ export default function RecordPage() {
   const [cid, setCid] = useState('');
   const [listingTx, setListingTx] = useState('');
 
+  const canContinue = session && session.data.length > 0 && session.durationSeconds >= 1;
+
   const handleUploadAndList = async () => {
-    if (!session) return;
+    if (!session || session.data.length === 0) return;
     setStep('upload');
 
-    // Simulate upload progress
     setUploadStatus('Preparing data...');
     setUploadProgress(10);
 
     try {
-      // Upload to Filecoin
-      setUploadStatus('Uploading to Filecoin...');
+      // Upload to Filecoin via Synapse SDK
+      setUploadStatus('Uploading to Filecoin via Synapse SDK...');
       setUploadProgress(30);
+
+      // Include actual EEG data samples (last 256 * duration samples for the upload)
+      const eegData = session.data.slice(-Math.min(session.data.length, 2000)).map(s => ({
+        t: s.timestamp,
+        ch: s.channels,
+      }));
 
       const uploadRes = await fetch('/api/storage/upload', {
         method: 'POST',
@@ -49,6 +56,7 @@ export default function RecordPage() {
           sampleRate: session.sampleRate,
           duration: session.durationSeconds,
           dataSize: session.data.length,
+          eegData,
         }),
       });
       const uploadData = await uploadRes.json();
@@ -115,9 +123,13 @@ export default function RecordPage() {
             <EEGRecorder />
             {session && (
               <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mt-6">
-                <GlowButton variant="cyan" size="lg" onClick={() => setStep('consent')}>
-                  Continue to Consent Settings
-                </GlowButton>
+                {canContinue ? (
+                  <GlowButton variant="cyan" size="lg" onClick={() => setStep('consent')}>
+                    Continue to Consent Settings
+                  </GlowButton>
+                ) : (
+                  <p className="text-sm text-gray-500">Record at least 1 second of data to continue.</p>
+                )}
               </motion.div>
             )}
           </motion.div>
@@ -154,7 +166,7 @@ export default function RecordPage() {
                 <input
                   type="number"
                   step="0.001"
-                  min="0"
+                  min="0.001"
                   value={price}
                   onChange={e => setPrice(e.target.value)}
                   className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 font-mono text-white focus:outline-none focus:border-neon-cyan/50 transition-colors"

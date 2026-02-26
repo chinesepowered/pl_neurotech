@@ -1,6 +1,6 @@
 import { EEGChannel, EEGSample } from '@/types/eeg';
 
-// Band power weights per region
+// Band power weights per region (controls relative contribution of each band)
 const BAND_WEIGHTS: Record<string, { delta: number; theta: number; alpha: number; beta: number }> = {
   frontal:   { delta: 0.3, theta: 0.2, alpha: 0.2, beta: 0.5 },
   central:   { delta: 0.3, theta: 0.3, alpha: 0.3, beta: 0.3 },
@@ -8,6 +8,7 @@ const BAND_WEIGHTS: Record<string, { delta: number; theta: number; alpha: number
   occipital: { delta: 0.2, theta: 0.2, alpha: 0.6, beta: 0.2 },
 };
 
+// Paul Kellett's refined pink noise algorithm (Voss-McCartney)
 function pinkNoise(state: { b: number[] }): number {
   const white = Math.random() * 2 - 1;
   const b = state.b;
@@ -60,7 +61,7 @@ export class EEGGenerator {
     }
     if (this.blinkCountdown > 0) {
       const progress = 1 - this.blinkCountdown / (0.3 * this.sampleRate);
-      blinkArtifact = 80 * Math.sin(Math.PI * progress) * Math.exp(-progress * 2);
+      blinkArtifact = 120 * Math.sin(Math.PI * progress) * Math.exp(-progress * 2);
       this.blinkCountdown--;
     }
 
@@ -70,7 +71,7 @@ export class EEGGenerator {
       this.nextMuscle = Math.random() * 8 + 5;
     }
     if (this.muscleCountdown > 0) {
-      muscleArtifact = 30 * (Math.random() * 2 - 1);
+      muscleArtifact = 40 * (Math.random() * 2 - 1);
       this.muscleCountdown--;
     }
 
@@ -78,26 +79,26 @@ export class EEGGenerator {
       const ch = this.channels[i];
       const w = BAND_WEIGHTS[ch.region];
 
-      // Additive synthesis
+      // Additive synthesis with realistic amplitudes (µV)
       let val = 0;
-      // Delta (0.5-4Hz)
-      val += this.generateBand(2, 3.5, w.delta * 40);
-      // Theta (4-8Hz)
-      val += this.generateBand(6, 4, w.theta * 25);
-      // Alpha (8-13Hz)
-      val += this.generateBand(10, 5, w.alpha * 30);
-      // Beta (13-30Hz)
-      val += this.generateBand(20, 17, w.beta * 15);
+      // Delta (0.5-4Hz) — typically 20-100µV
+      val += this.generateBand(2, 3.5, w.delta * 75);
+      // Theta (4-8Hz) — typically 10-50µV
+      val += this.generateBand(6, 4, w.theta * 50);
+      // Alpha (8-13Hz) — typically 20-100µV (dominant in occipital)
+      val += this.generateBand(10, 5, w.alpha * 60);
+      // Beta (13-30Hz) — typically 5-30µV
+      val += this.generateBand(20, 17, w.beta * 25);
 
-      // Pink noise
-      val += pinkNoise(this.noiseStates[i]) * 10;
+      // Pink noise background (~10-15µV)
+      val += pinkNoise(this.noiseStates[i]) * 15;
 
-      // Eye blink artifact (Fp1/Fp2)
+      // Eye blink artifact (Fp1/Fp2) — typically 50-200µV
       if (ch.region === 'frontal') {
         val += blinkArtifact;
       }
 
-      // Muscle artifact (temporal)
+      // Muscle artifact (temporal) — high-frequency burst
       if (ch.region === 'temporal') {
         val += muscleArtifact;
       }

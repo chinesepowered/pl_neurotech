@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { retrieveFromFilecoin } from '@/lib/filecoin/synapse';
+import { retrieveFromFilecoin, isSynapseConfigured } from '@/lib/filecoin/synapse';
 
 export async function GET(request: Request) {
   try {
@@ -15,8 +15,10 @@ export async function GET(request: Request) {
     if (!data) {
       return NextResponse.json({
         cid,
-        status: 'demo-mode',
-        message: 'Data retrieval available with Synapse SDK configured',
+        status: isSynapseConfigured() ? 'not-found' : 'demo-mode',
+        message: isSynapseConfigured()
+          ? 'Piece not found on Filecoin network'
+          : 'Configure FILECOIN_PRIVATE_KEY to enable Synapse SDK storage',
       });
     }
 

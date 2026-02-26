@@ -14,6 +14,7 @@
     "dependencies": {
         "@ai-sdk/cerebras": "^2.0.34",
         "@ai-sdk/react": "^3.0.99",
+        "@filoz/synapse-sdk": "^0.37.0",
         "@openzeppelin/contracts": "^5.1.0",
         "ai": "^6.0.97",
         "canvas-confetti": "^1.9.3",
@@ -22,6 +23,7 @@
         "next": "^15.3.0",
         "react": "^19.0.0",
         "react-dom": "^19.0.0",
+        "viem": "^2.46.3",
         "zod": "^4.3.6",
         "zustand": "^5.0.3"
     },
