@@ -11,80 +11,80 @@ import SessionMetadata from './SessionMetadata';
 
 const BUFFER_SIZE = 1024;
 // At ~60fps, 4 samples/frame gives ~240 samples/s which approximates 256Hz
-// At lower framerates the visual still looks smooth
 const SAMPLES_PER_FRAME = 4;
 
 export default function EEGRecorder() {
-  const { isRecording, isPaused, duration, session, startRecording, stopRecording, pauseRecording, resumeRecording, addSamples } = useEEGStore();
+  const { isRecording, isPaused, duration, session, startRecording, stopRecording, pauseRecording, resumeRecording } = useEEGStore();
   const generatorRef = useRef<EEGGenerator | null>(null);
   const buffersRef = useRef<Float32Array[]>(EEG_CHANNELS.map(() => new Float32Array(BUFFER_SIZE)));
   const bufferIndexRef = useRef(0);
   const animRef = useRef<number>(0);
-  const [, forceUpdate] = useState(0);
+  const [, setFrame] = useState(0);
 
-  const tick = useCallback(() => {
-    if (!generatorRef.current) return;
-    const store = useEEGStore.getState();
-    if (!store.isRecording || store.isPaused) {
-      animRef.current = requestAnimationFrame(tick);
-      return;
-    }
+  // Lazy-init generator
+  if (!generatorRef.current) {
+    generatorRef.current = new EEGGenerator(SAMPLE_RATE, EEG_CHANNELS);
+  }
 
-    const batch = generatorRef.current.generateBatch(SAMPLES_PER_FRAME);
-    store.addSamples(batch);
+  // Single animation loop for the lifetime of the component.
+  // Reads store state directly each frame — no stale closures.
+  useEffect(() => {
+    let active = true;
 
-    for (const sample of batch) {
-      for (let ch = 0; ch < sample.channels.length; ch++) {
-        buffersRef.current[ch][bufferIndexRef.current] = sample.channels[ch];
+    const tick = () => {
+      if (!active) return;
+
+      const state = useEEGStore.getState();
+
+      // Generate data when idle (preview) or actively recording
+      const isIdle = !state.isRecording && !state.session;
+      const isActiveRecording = state.isRecording && !state.isPaused;
+
+      if (isIdle || isActiveRecording) {
+        const gen = generatorRef.current;
+        if (gen) {
+          const batch = gen.generateBatch(SAMPLES_PER_FRAME);
+
+          // Only store to session data when recording
+          if (isActiveRecording) {
+            state.addSamples(batch);
+          }
+
+          // Always write to ring buffer for display
+          for (const sample of batch) {
+            for (let ch = 0; ch < sample.channels.length; ch++) {
+              buffersRef.current[ch][bufferIndexRef.current] = sample.channels[ch];
+            }
+            bufferIndexRef.current = (bufferIndexRef.current + 1) % BUFFER_SIZE;
+          }
+
+          // Trigger re-render so WaveformCanvas draws new data
+          setFrame(n => n + 1);
+        }
       }
-      bufferIndexRef.current = (bufferIndexRef.current + 1) % BUFFER_SIZE;
-    }
 
-    forceUpdate(n => n + 1);
+      animRef.current = requestAnimationFrame(tick);
+    };
+
     animRef.current = requestAnimationFrame(tick);
+    return () => {
+      active = false;
+      cancelAnimationFrame(animRef.current);
+    };
   }, []);
 
   const handleStart = useCallback(() => {
+    // Fresh generator for consistent timing, but DON'T reset buffers —
+    // keeps the idle waveforms for a seamless visual transition
     generatorRef.current = new EEGGenerator(SAMPLE_RATE, EEG_CHANNELS);
-    buffersRef.current = EEG_CHANNELS.map(() => new Float32Array(BUFFER_SIZE));
-    bufferIndexRef.current = 0;
     startRecording();
-    animRef.current = requestAnimationFrame(tick);
-  }, [startRecording, tick]);
+  }, [startRecording]);
 
   const handleStop = useCallback(() => {
-    cancelAnimationFrame(animRef.current);
     stopRecording();
+    // Loop keeps running but won't generate new data
+    // (session exists + not recording = frozen display)
   }, [stopRecording]);
-
-  useEffect(() => {
-    return () => cancelAnimationFrame(animRef.current);
-  }, []);
-
-  // Run idle animation when not recording
-  useEffect(() => {
-    if (!isRecording && !session) {
-      generatorRef.current = new EEGGenerator(SAMPLE_RATE, EEG_CHANNELS);
-      let active = true;
-      const idleTick = () => {
-        if (!active || !generatorRef.current) return;
-        const batch = generatorRef.current.generateBatch(SAMPLES_PER_FRAME);
-        for (const sample of batch) {
-          for (let ch = 0; ch < sample.channels.length; ch++) {
-            buffersRef.current[ch][bufferIndexRef.current] = sample.channels[ch];
-          }
-          bufferIndexRef.current = (bufferIndexRef.current + 1) % BUFFER_SIZE;
-        }
-        forceUpdate(n => n + 1);
-        animRef.current = requestAnimationFrame(idleTick);
-      };
-      animRef.current = requestAnimationFrame(idleTick);
-      return () => {
-        active = false;
-        cancelAnimationFrame(animRef.current);
-      };
-    }
-  }, [isRecording, session]);
 
   return (
     <div className="space-y-6">
@@ -110,7 +110,6 @@ export default function EEGRecorder() {
           buffers={buffersRef.current}
           bufferIndex={bufferIndexRef.current}
           bufferSize={BUFFER_SIZE}
-          isActive={true}
         />
 
         <div className="mt-4">

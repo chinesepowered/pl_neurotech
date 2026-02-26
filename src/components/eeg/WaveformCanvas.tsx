@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useEffect, useCallback } from 'react';
+import { useRef, useEffect } from 'react';
 import { EEGChannel } from '@/types/eeg';
 
 interface WaveformCanvasProps {
@@ -8,15 +8,15 @@ interface WaveformCanvasProps {
   buffers: Float32Array[];
   bufferIndex: number;
   bufferSize: number;
-  isActive: boolean;
   className?: string;
 }
 
-export default function WaveformCanvas({ channels, buffers, bufferIndex, bufferSize, isActive, className = '' }: WaveformCanvasProps) {
+export default function WaveformCanvas({ channels, buffers, bufferIndex, bufferSize, className = '' }: WaveformCanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const animFrameRef = useRef<number>(0);
 
-  const draw = useCallback(() => {
+  // Draw once per render — parent controls frame rate via state updates.
+  // No self-scheduling rAF here; avoids competing animation loops.
+  useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
@@ -68,14 +68,14 @@ export default function WaveformCanvas({ channels, buffers, bufferIndex, bufferS
       const amplitude = (channelHeight - padding * 2) / 2;
       const color = channels[ch].color;
 
-      // Dynamic amplitude scaling: find max value in visible range for this channel
+      // Dynamic amplitude scaling: find max value in visible range
       let maxVal = 0;
       for (let i = 0; i < visibleSamples; i++) {
         const idx = (bufferIndex - visibleSamples + i + bufferSize) % bufferSize;
         const absVal = Math.abs(buffer[idx] || 0);
         if (absVal > maxVal) maxVal = absVal;
       }
-      // Use 50µV as minimum scale (typical EEG range), clamp to at least that
+      // 50µV minimum scale (typical EEG range)
       const scale = Math.max(maxVal, 50);
 
       // Glow effect
@@ -108,20 +108,7 @@ export default function WaveformCanvas({ channels, buffers, bufferIndex, bufferS
       ctx.font = '11px "JetBrains Mono", monospace';
       ctx.fillText(channels[ch].name, 8, ch * channelHeight + 18);
     }
-
-    if (isActive) {
-      animFrameRef.current = requestAnimationFrame(draw);
-    }
-  }, [channels, buffers, bufferIndex, bufferSize, isActive]);
-
-  useEffect(() => {
-    if (isActive) {
-      animFrameRef.current = requestAnimationFrame(draw);
-    }
-    return () => {
-      if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current);
-    };
-  }, [isActive, draw]);
+  }, [channels, buffers, bufferIndex, bufferSize]);
 
   return (
     <canvas

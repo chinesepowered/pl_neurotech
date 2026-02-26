@@ -17,7 +17,7 @@ export async function POST(request: Request) {
   const systemPrompt = `${AGENT_SYSTEM_PROMPT}\n\n## Current Session\n- Budget: ${budget} tFIL\n- Timestamp: ${new Date().toISOString()}\n- Important: Use the budgetRemaining field in tool results to track your spending. Do not exceed your budget.`;
 
   // Convert UIMessages (from useChat) to ModelMessages (for streamText)
-  const modelMessages = convertToModelMessages(messages);
+  const modelMessages = await convertToModelMessages(messages);
 
   const result = streamText({
     model: cerebras('llama-3.3-70b'),
