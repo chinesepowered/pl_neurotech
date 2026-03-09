@@ -4,7 +4,7 @@
 
 ## What This Is
 
-A neural data wallet + AI agent marketplace on Filecoin. Users record EEG sessions, store on Filecoin via Synapse SDK, set consent/pricing, list on a marketplace, and autonomous AI agents (Cerebras llama-3.3-70b) can browse/evaluate/purchase datasets via streaming tool calls.
+A neural data wallet + AI agent marketplace on Filecoin. Users record EEG sessions, store on Filecoin via Synapse SDK, set consent/pricing, list on a marketplace, and autonomous AI agents (Cerebras gpt-oss-120b) can browse/evaluate/purchase datasets via streaming tool calls.
 
 ## Current State
 
@@ -65,7 +65,7 @@ import { streamText, stepCountIs } from 'ai';
 import { cerebras } from '@ai-sdk/cerebras';
 
 const result = streamText({
-  model: cerebras('llama-3.3-70b'),  // Returns LanguageModelV3
+  model: cerebras('gpt-oss-120b'),  // Returns LanguageModelV3
   system: '...',
   messages,
   tools: myTools,

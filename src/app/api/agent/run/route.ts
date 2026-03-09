@@ -20,7 +20,7 @@ export async function POST(request: Request) {
   const modelMessages = await convertToModelMessages(messages);
 
   const result = streamText({
-    model: cerebras('llama-3.3-70b'),
+    model: cerebras('gpt-oss-120b'),
     system: systemPrompt,
     messages: modelMessages,
     tools: agentTools,

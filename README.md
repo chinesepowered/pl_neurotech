@@ -35,7 +35,7 @@ Watch the agent think in real-time — every reasoning step, tool call, and purc
 | Layer | Technology |
 |-------|------------|
 | Frontend | Next.js 15 (App Router, Turbopack), TypeScript, Tailwind CSS v4, Framer Motion |
-| AI Agent | Cerebras `llama-3.3-70b` via Vercel AI SDK v6, SSE streaming with tool calls |
+| AI Agent | Cerebras `gpt-oss-120b` via Vercel AI SDK v6, SSE streaming with tool calls |
 | Smart Contract | Solidity 0.8.20, OpenZeppelin ReentrancyGuard, Hardhat |
 | Storage | Filecoin (Calibration Testnet), content-addressed CIDs |
 | Visualization | Canvas API for 60fps EEG waveform rendering |
