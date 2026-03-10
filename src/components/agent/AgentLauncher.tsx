@@ -23,7 +23,7 @@ export default function AgentLauncher({ onLaunch, isRunning }: AgentLauncherProp
         </div>
         <div>
           <h3 className="font-semibold">AI Buyer Agent</h3>
-          <p className="text-xs text-gray-500">Powered by Cerebras Llama 3.3 70B (~2000 tok/s)</p>
+          <p className="text-xs text-gray-500">Autonomous data buyer</p>
         </div>
       </div>
 

@@ -46,7 +46,7 @@ const features = [
       </svg>
     ),
     title: 'AI Buyer Agents',
-    description: 'Autonomous agents powered by Cerebras evaluate datasets, reason about quality, and purchase in real-time.',
+    description: 'Autonomous agents evaluate datasets, reason about quality, and purchase neural data in real-time.',
     glow: 'amber' as const,
   },
 ];

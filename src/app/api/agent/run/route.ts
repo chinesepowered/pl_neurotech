@@ -1,7 +1,13 @@
 import { streamText, stepCountIs, convertToModelMessages } from 'ai';
-import { cerebras } from '@ai-sdk/cerebras';
+import { createOpenAICompatible } from '@ai-sdk/openai-compatible';
 import { AGENT_SYSTEM_PROMPT } from '@/lib/agent/system-prompt';
 import { agentTools, resetAgentSession } from '@/lib/agent/tools';
+
+const wandb = createOpenAICompatible({
+  name: 'wandb',
+  apiKey: process.env.WANDB_API_KEY,
+  baseURL: 'https://api.inference.wandb.ai/v1',
+});
 
 export const maxDuration = 60;
 
@@ -20,7 +26,7 @@ export async function POST(request: Request) {
   const modelMessages = await convertToModelMessages(messages);
 
   const result = streamText({
-    model: cerebras('gpt-oss-120b'),
+    model: wandb.chatModel('zai-org/GLM-5-FP8'),
     system: systemPrompt,
     messages: modelMessages,
     tools: agentTools,

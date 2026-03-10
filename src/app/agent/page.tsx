@@ -31,7 +31,7 @@ export default function AgentPage() {
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
         <h1 className="text-3xl font-bold mb-2">Autonomous AI Buyer Agent</h1>
         <p className="text-gray-400 mb-8">
-          Launch an AI agent powered by Cerebras to autonomously browse, evaluate, and purchase neural datasets.
+          Launch an AI agent to autonomously browse, evaluate, and purchase neural datasets.
         </p>
       </motion.div>
 
@@ -61,9 +61,7 @@ export default function AgentPage() {
           <GlassPanel>
             <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-3">Model Info</h3>
             <div className="space-y-2 text-sm">
-              <div className="flex justify-between"><span className="text-gray-500">Model</span><span className="font-mono text-xs">gpt-oss-120b</span></div>
-              <div className="flex justify-between"><span className="text-gray-500">Provider</span><span>Cerebras</span></div>
-              <div className="flex justify-between"><span className="text-gray-500">Speed</span><span className="text-neon-green">~2000 tok/s</span></div>
+              <div className="flex justify-between"><span className="text-gray-500">Model</span><span className="font-mono text-xs">GLM-5-FP8</span></div>
               <div className="flex justify-between"><span className="text-gray-500">Max Steps</span><span>10</span></div>
             </div>
           </GlassPanel>
