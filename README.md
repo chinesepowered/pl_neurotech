@@ -4,6 +4,8 @@
 
 NeuroVault is a decentralized neural data wallet and agent marketplace. It gives individuals sovereignty over their brain data — record EEG sessions, store them immutably on Filecoin, define granular consent terms, and monetize them through an open marketplace where autonomous AI agents can browse, evaluate, and purchase datasets in real-time.
 
+> 📊 **Live on Filecoin Calibration Testnet:** View our [On-Chain Activity Report](on-chain.md) for verified smart contracts, real transactions, and Synapse SDK storage proofs.
+
 ## The Problem
 
 Neural data is one of the most intimate forms of personal information, yet individuals have almost zero control over how it's collected, stored, or used. Research institutions and corporations accumulate massive EEG datasets behind closed doors, with no transparency, no consent mechanisms, and no compensation for the people whose brains generated the data.
